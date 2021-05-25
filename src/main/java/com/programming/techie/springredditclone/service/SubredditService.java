@@ -4,9 +4,13 @@ import com.programming.techie.springredditclone.dto.SubredditDto;
 import com.programming.techie.springredditclone.exceptions.SpringRedditException;
 import com.programming.techie.springredditclone.mapper.SubredditMapper;
 import com.programming.techie.springredditclone.model.Subreddit;
+import com.programming.techie.springredditclone.model.User;
 import com.programming.techie.springredditclone.repository.SubredditRepository;
+import com.programming.techie.springredditclone.repository.UserRepository;
+import com.programming.techie.springredditclone.security.JwtProvider;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,10 +25,17 @@ public class SubredditService {
 
     private final SubredditRepository subredditRepository;
     private final SubredditMapper subredditMapper;
+    private final JwtProvider jwtProvider;
+    private final UserRepository userRepository;
 
     @Transactional
-    public SubredditDto save(SubredditDto subredditDto) {
-        Subreddit save = subredditRepository.save(subredditMapper.mapDtoToSubreddit(subredditDto));
+    public SubredditDto save(SubredditDto subredditDto, String authHeader1) {
+        String authHeader = authHeader1.substring(7);
+        Subreddit subreddit = subredditMapper.mapDtoToSubreddit(subredditDto);
+        String username = jwtProvider.getUsernameFromJwt(authHeader);
+        User user = userRepository.findByUsername(username).get();
+        subreddit.setUser(user);
+        Subreddit save = subredditRepository.save(subreddit);
         subredditDto.setId(save.getId());
         return subredditDto;
     }

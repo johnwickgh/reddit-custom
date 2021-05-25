@@ -19,9 +19,11 @@ public class SubredditController {
     private final SubredditService subredditService;
 
     @PostMapping
-    public ResponseEntity<SubredditDto> createSubreddit(@RequestBody SubredditDto subredditDto) {
+    public ResponseEntity<SubredditDto> createSubreddit(
+            @RequestBody SubredditDto subredditDto,
+            @RequestHeader(value = "Authorization") String authHeader) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(subredditService.save(subredditDto));
+                .body(subredditService.save(subredditDto, authHeader));
     }
 
     @GetMapping
