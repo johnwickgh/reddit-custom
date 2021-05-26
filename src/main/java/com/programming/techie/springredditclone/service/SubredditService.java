@@ -29,10 +29,9 @@ public class SubredditService {
     private final UserRepository userRepository;
 
     @Transactional
-    public SubredditDto save(SubredditDto subredditDto, String authHeader1) {
-        String authHeader = authHeader1.substring(7);
+    public SubredditDto save(SubredditDto subredditDto, String authHeader) {
         Subreddit subreddit = subredditMapper.mapDtoToSubreddit(subredditDto);
-        String username = jwtProvider.getUsernameFromJwt(authHeader);
+        String username = jwtProvider.getUsernameFromJwt(authHeader.substring(7));
         User user = userRepository.findByUsername(username).get();
         subreddit.setUser(user);
         Subreddit save = subredditRepository.save(subreddit);
